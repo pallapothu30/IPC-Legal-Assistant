@@ -21,7 +21,7 @@ A production-oriented Retrieval-Augmented Generation (RAG) application for answe
 
 ## Demo
 
-[Watch the local app demo](assets/demo.mp4)
+[Watch the local app demo]([assets/demo.mp4](https://github.com/user-attachments/assets/7a5c4992-bd56-42f5-a800-e632d999e798))
 
 
 ## Project Structure
