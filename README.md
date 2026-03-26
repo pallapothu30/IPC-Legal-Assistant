@@ -71,7 +71,7 @@ python -m ingestion.ingest_ipc --input data/indian_penal_code.pdf
 ## Run the App
 
 ```bash
-streamlit run app/main.py
+python -m streamlit run app/main.py
 ```
 
 ## Notes
