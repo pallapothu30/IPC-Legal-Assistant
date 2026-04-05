@@ -1,2 +1,0 @@
-"""Retriever utilities."""
-

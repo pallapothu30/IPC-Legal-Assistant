@@ -1,58 +1,42 @@
 # IPC Legal Assistant
 
-A production-oriented Retrieval-Augmented Generation (RAG) application for answering questions about the Indian Penal Code (IPC) using:
+A simple Retrieval-Augmented Generation (RAG) app for answering questions about the Indian Penal Code (IPC) with a Streamlit frontend and FastAPI backend.
 
-- Groq `llama3-70b-8192`
-- HuggingFace embeddings `BAAI/bge-base-en-v1.5`
-- ChromaDB with local persistence
-- LangChain orchestration
-- Streamlit frontend
-
-## Features
-
-- Loads IPC content from PDF or text files
-- Cleans and structures IPC sections with metadata
-- Chunks text with `chunk_size=700` and `chunk_overlap=120`
-- Stores embeddings in persistent ChromaDB
-- Retrieves top `k=5` relevant chunks
-- Uses a strict prompt to answer only from retrieved IPC context
-- Shows answers, relevant sections, and source excerpts
-- Includes conversational memory during the app session
-
-## Demo
-
-[Watch the local app demo](https://github.com/user-attachments/assets/7a5c4992-bd56-42f5-a800-e632d999e798)
-
-
-## Project Structure
+## Structure
 
 ```text
 IPC_RAG/
-├── app/
-├── chains/
-├── embeddings/
-├── ingestion/
-├── retriever/
-├── vectorstore/
+├── backend/
+│   ├── api/
+│   │   ├── app.py
+│   │   └── routes/
+│   ├── core/
+│   │   ├── config.py
+│   │   └── exceptions.py
+│   ├── schemas/
+│   │   └── query.py
+│   └── services/
+│       ├── ingestion_service.py
+│       └── rag_service.py
+├── frontend/
+│   └── streamlit_app.py
+├── scripts/
+│   ├── ingest_ipc.py
+│   ├── run_backend.py
+│   └── run_frontend.py
 ├── data/
-├── config.py
+├── chroma_db/
 ├── requirements.txt
 └── README.md
 ```
 
 ## Setup
 
-1. Create and activate a virtual environment.
-2. Install dependencies:
-
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Copy `.env.example` to `.env` and add your Groq API key.
-4. Put your IPC source file in `data/` as either `.pdf` or `.txt`.
-
-Example `.env`:
+Create `.env` from `.env.example` and configure:
 
 ```env
 GROQ_API_KEY=your_groq_api_key_here
@@ -60,22 +44,47 @@ GROQ_MODEL_NAME=llama-3.3-70b-versatile
 IPC_DATA_PATH=data/indian_penal_code.pdf
 CHROMA_PERSIST_DIR=chroma_db
 COLLECTION_NAME=ipc_sections
+API_HOST=127.0.0.1
+API_PORT=8000
+API_TIMEOUT=30
 ```
 
 ## Build the Vector Database
 
 ```bash
-python -m ingestion.ingest_ipc --input data/indian_penal_code.pdf
+python scripts/ingest_ipc.py --input data/indian_penal_code.pdf
 ```
 
 ## Run the App
 
+Terminal 1:
+
 ```bash
-python -m streamlit run app/main.py
+python scripts/run_backend.py
 ```
+
+Terminal 2:
+
+```bash
+python scripts/run_frontend.py
+```
+
+Direct commands:
+
+```bash
+uvicorn backend.api.app:app --host 127.0.0.1 --port 8000
+python -m streamlit run frontend/streamlit_app.py
+```
+
+## API Endpoints
+
+- `GET /`
+- `GET /health`
+- `GET /config`
+- `POST /query`
 
 ## Notes
 
 - The app answers strictly from retrieved IPC context.
-- If the needed answer is not in the retrieved context, it returns the fallback message.
-- Chroma data is persisted locally in `chroma_db/`.
+- ChromaDB is stored locally in `chroma_db/`.
+- The frontend talks to the backend over HTTP using the configured host and port.
